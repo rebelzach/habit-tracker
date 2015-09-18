@@ -1,0 +1,14 @@
+{
+  "eventName": "post_button_press",
+  "url": "http://rhythms.azurewebsites.net/button-events/",
+  "requestType": "post",
+  "mydevices": true,
+  "json" : {
+    "buttonIndex": "{{buttonIndex}}",
+    "eventType": "{{eventType}}"
+  },
+  "auth": {
+    "username": "rhythmuser",
+    "password": "Letsdoitfortherightreasons"
+  }
+}

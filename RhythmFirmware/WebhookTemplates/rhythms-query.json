@@ -1,0 +1,10 @@
+{
+  "eventName": "get_rhythms",
+  "url": "http://rhythms.azurewebsites.net/rhythms/",
+  "requestType": "GET",
+  "mydevices": true,
+  "auth": {
+    "username": "rhythmuser",
+    "password": "Letsdoitfortherightreasons"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "eventName": "get_rhythm",
+  "url": "http://rhythms.azurewebsites.net/rhythms/{{SPARK_EVENT_VALUE}}",
+  "requestType": "GET",
+  "mydevices": true,
+  "auth": {
+    "username": "rhythmuser",
+    "password": "Letsdoitfortherightreasons"
+  }
+}
