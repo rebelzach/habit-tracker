@@ -22,6 +22,8 @@ LazyTimer(coolPulseTimer);
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 int wifiStrength = 0;
+int skippedFrames = 0;
+
 
 void setup()
 {
@@ -47,6 +49,7 @@ void setup()
     Spark.connect();
 
     Spark.variable("wifiStrength", &wifiStrength, INT);
+    Spark.variable("skippedFrames", &skippedFrames, INT);
 
     Spark.subscribe("hook-response/post_button_press", gotPressResponse, MY_DEVICES);
     Spark.subscribe("hook-response/get_rhythms", gotRhythmData, MY_DEVICES);
@@ -197,7 +200,9 @@ void setRhythmGauge(int index, int rhythmValue)
 
 void setCoolDown(int index, int coolDownValue) {
     if (coolDownValue > 95) {
+
         isPulsingCool[index] = true;
+
         return;
     }
     isPulsingCool[index] = false;
@@ -231,6 +236,8 @@ void debug(String message, int value) {
     Spark.publish("DEBUG", msg);
 }
 
+int previousFrame = -1;
+
 void processAnimations ()
 {
     // 2 part animation
@@ -239,7 +246,16 @@ void processAnimations ()
         ResetLazyTimer(coolPulseTimer);
     }
 
-    int frame = (int)round((coolPulseTimer / 16.6f)); // 60 fps
+    int frame = (int)round((LazyTimerDuration(coolPulseTimer) / 16.6f)); // 60 fps
+
+    if (frame != previousFrame) {
+        if (frame + 1 != previousFrame) {
+            ++skippedFrames;
+        }
+        previousFrame = frame;
+    } else {
+        return;
+    }
 
     // delay
     if (frame < 180) {
@@ -250,21 +266,22 @@ void processAnimations ()
     // animate
     if (frame < 180 + 45) {
         int normalizedFrame = frame - 180;
-        writePulsingButtonLeds (255 - (255 * (normalizedFrame / 45))); // Scale by 255 and invert (getting darker)
+        writePulsingButtonLeds (255 - (255 * (normalizedFrame / 45.0f))); // Scale by 255 and invert (getting darker)
         return;
     }
 
     if (frame < 180 + 90) { // this is here for clarity, technically this condition is always true
         int normalizedFrame = frame - 180;
-        writePulsingButtonLeds ((255 * (normalizedFrame / 45))); // Scale by 255 (getting brighter)
+        writePulsingButtonLeds ((255 * (normalizedFrame / 45.0f))); // Scale by 255 (getting brighter)
     }
 }
 
 void writePulsingButtonLeds (int value)
 {
     for (int i = 0; i < RHYTHM_COUNT; i++) {
-        if (isPulsingCool[i]) {
+        //if (isPulsingCool[i]) {
+            //debug("trying: %d", value);
             analogWrite(buttonLedPins[i], 255-value); // Invert
-        }
+        //}
     }
 }
